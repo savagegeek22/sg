@@ -1,0 +1,62 @@
+~
+ <icecast>
+   <limits>
+     <clients>20</clients>
+     <sources>20</sources>
+     <threadpool>40</threadpool>
+     <queue-size>524288</queue-size>
+     <client-timeout>60</client-timeout>
+     <header-timeout>30</header-timeout>
+     <source-timeout>20</source-timeout>
+     <burst-on-connect>0</burst-on-connect>
+     <burst-size>65535</burst-size>
+   </limits>
+
+   <authentication>
+     <source-password>SUPER-SECRET-PASSWORD</source-password>
+     <relay-password>SUPER-SECRET-PASSWORD</relay-password>
+     <admin-user>admin</admin-user>
+     <admin-password>SUPER-SECRET-PASSWORD</admin-password>
+   </authentication>
+
+      <hostname>YOUR-FQDN.EXAMPLE.com</hostname>
+
+   <listen-socket>
+      <port>8000</port>
+      <bind-address>127.0.0.1</bind-address>
+   </listen-socket>
+
+<!-- This is a test to see if I can get 443 to work using Let's Encrypt -->
+<!-- Reference https://stackoverflow.com/questions/49300064/icecast-2-and-ssl -->
+
+<!--   <listen-socket> -->
+<!--        <port>8443</port> -->
+<!--        <ssl>1</ssl> -->
+<!--        <bind-address>192.168.0.100</bind-address> -->
+<!--        <ssl-allowed-ciphers>ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS</ssl-allowed-ciphers> -->
+<!--   </listen-socket> -->
+
+
+
+      <fileserve>1</fileserve>
+
+   <paths>
+      <basedir>/opt/icecast/2.3.2</basedir>
+      <logdir>/var/log/icecast</logdir>
+      <webroot>/opt/icecast/2.3.2/share/icecast/web</webroot>
+      <adminroot>/opt/icecast/2.3.2/share/icecast/admin</adminroot>
+      <alias source="/" dest="/status.xsl"/>
+<!--      <ssl-certificate>/opt/icecast/2.3.2/share/icecast/web/music.savagegeek.com/icecast.pem</ssl-certificate> -->
+   </paths>
+
+   <logging>
+      <accesslog>access.log</accesslog>
+      <errorlog>error.log</errorlog>
+      <loglevel>5</loglevel>
+      <logsize>10000</logsize>
+   </logging>
+
+   <security>
+      <chroot>0</chroot>
+   </security>
+ </icecast>
