@@ -1,4 +1,4 @@
-~
+<!-- THIS IS THE ICECAST STEAMING ENGINE THAT MUST BE RUNNING BEFORE CLIENTS (IE. ICES CAN BE ATTACHED -->
  <icecast>
    <limits>
      <clients>20</clients>
@@ -26,19 +26,18 @@
       <bind-address>127.0.0.1</bind-address>
    </listen-socket>
 
-<!-- This is a test to see if I can get 443 to work using Let's Encrypt -->
+<!-- This WAS is a test to see if I can get 443 to work using Let's Encrypt -->
+<!-- BUT! icecast does not work natively with SSL, so NGINX HAD TO BE USED 
 <!-- Reference https://stackoverflow.com/questions/49300064/icecast-2-and-ssl -->
 
 <!--   <listen-socket> -->
 <!--        <port>8443</port> -->
 <!--        <ssl>1</ssl> -->
-<!--        <bind-address>192.168.0.100</bind-address> -->
+<!--        <bind-address>192.168.X.X</bind-address> -->
 <!--        <ssl-allowed-ciphers>ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS</ssl-allowed-ciphers> -->
 <!--   </listen-socket> -->
 
-
-
-      <fileserve>1</fileserve>
+     <fileserve>1</fileserve>
 
    <paths>
       <basedir>/opt/icecast/2.3.2</basedir>
