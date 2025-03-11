@@ -1,0 +1,90 @@
+# This setup makes Nginx act as a secure reverse proxy for Icecast, 
+# logging access, preserving client IPs, and ensuring proper request forwarding.
+
+  server
+  {
+    listen 80;
+    server_name music.savagegeek.com;
+
+    location ~ /.well-known
+    {
+      allow all;
+    }
+
+    location /
+    {
+      if ($ssl_protocol = "")
+      {
+        rewrite ^ https://$server_name$request_uri? permanent;
+      }
+    }
+  }
+
+#### SSL ######################################################
+
+server
+{
+
+  ssl_certificate_key /root/.acme.sh/music.savagegeek.com/music.savagegeek.com.key;
+  ssl_certificate /opt/icecast/2.3.2/share/icecast/web/music.savagegeek.com/icecast.pem;
+
+ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+# Recommended security settings from https://wiki.mozilla.org/Security  /Server_Side_TLS
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
+  ssl_prefer_server_ciphers on;
+  ssl_ecdh_curve secp384r1;
+  ssl_session_timeout 5m;
+  ssl_session_cache shared:SSL:5m;
+  ssl_session_tickets off;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  
+# RESOLVER IS DNSDIST IN FRONT OF RECURSOR!
+  resolver 192.168.2.223 valid=300s;
+  resolver_timeout 5s;
+
+
+# Enable this if you want HSTS (recommended)
+# With or without preload (without very secure but not recommended)
+  add_header Strict-Transport-Security "max-age=15768000; includeSubdomains;";
+  add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+  listen 443 ssl;
+  root /var/www/html;
+
+  server_name music.savagegeek.com;
+
+  location ~ /.well-known
+  {
+    allow all;
+  }
+
+  location /
+  {
+  #  setting up a reverse proxy to forward requests to an Icecast streaming server running on port 8000. 
+  
+    access_log /var/log/icecast/access_https.log icecast_combined;
+  
+  # Forwards all incoming requests to the Icecast server running on 127.0.0.1:8000.
+  # Nginx acts as a reverse proxy, meaning clients connect to Nginx, which then relays the request to Icecast.
+    proxy_pass http://127.0.0.1:8000/;
+
+  # Disables automatic modification of Location and Refresh headers in responses from the backend (Icecast).
+  # This ensures that Icecast returns URLs as-is without Nginx altering them.
+    proxy_redirect off;
+
+  # Sets the Host header to the original host requested by the client ($host).
+  # Helps Icecast recognize the correct domain being used.
+    proxy_set_header Host $host;
+   
+  # Passes the original client IP address ($remote_addr) to Icecast.
+  # This is useful for logging and access control on the backend.
+     proxy_set_header X-Real-IP $remote_addr;
+
+  # Adds the original client's IP to the X-Forwarded-For header, preserving the full chain of proxying.
+  # If multiple proxies are in use, this helps Icecast see the real source IP of the request.
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
