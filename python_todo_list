@@ -1,0 +1,62 @@
+# todos = [] # <- This is a list type object!! 
+             # <- ...because we are using a text file to accomodate the list
+
+while True: # True is a boolean data type !!
+    
+    user_action = input("Type add, show, edit, complete, or exit: ")
+    user_action = user_action.strip() # <- This will strip any spaces from add if there is a trailing space
+
+    match user_action: # <- Match-case
+         case 'add':
+             todo = input("Enter a todo: ") + "\n" # <-- \n Allows a break line to be added after each added entry
+
+             with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'r') as file: # <-- with-context manager read
+                  todos = file.readlines() # <-- Read the lines presented already
+
+             todos.append(todo.capitalize()) # <- This will append to the list, capitalize, and "append" is a method for todo
+
+             with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'w') as file: # <-- with-context manager write
+                 todos = file.writelines(todos) # <-- Write the lines presented
+
+         case 'show': 
+                 
+              with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'r') as file: # <-- with-context manager read file
+                  todos = file.readlines() # <-- Read the lines presented already
+
+              for index, item in enumerate(todos): # <- For LOOP will print the (item) from the user input and the number in the INDEX
+                  item = item.strip('\n')
+                  row = f"{index + 1}-{item}" # <-- f-string to index plus 1 w/ dash - and then the item
+                  print(row) # <-- Print the row 
+
+         case 'edit': 
+              number = int(input("Number of the todo to edit: ")) # Converting a string to an integer
+              number = number - 1 # Since the list starts with 0 but user does not know, we need to set the number minus 1 to accomodate
+
+              with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'r') as file: # <-- with-context manager read file
+                  todos = file.readlines() # <-- Read the lines presented already
+
+              new_todo = input("Enter new todo: ") # This allows the user to edit the list
+              todos[number] = new_todo + '\n' # This is the new entry that gets added to the to todos
+
+              with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'w') as file: # <-- with-context manager write
+                 todos = file.writelines(todos) # <-- Write the lines presented
+
+         case 'complete':
+             number = int(input("Number of the todo to complete: "))
+
+             with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'r') as file: # <-- with-context manager read file
+                  todos = file.readlines() # <-- Read the lines presented already
+             index = number - 1
+             todo_to_remove = todos[index].strip('\n')
+             todos.pop(index) # <-- will remove item from the list using 
+                              # pop method number minus 1 due to items starting at 0
+            
+             with open('/Users/jd/Python/todo_app/Day8/todos.txt', 'w') as file: # <-- with-context manager write
+                 todos = file.writelines(todos) # <-- Write the lines presented
+
+             message = f"Todos '{todo_to_remove}' has been removed from the list"
+             print(message)
+         case 'exit':
+             break
+        
+print("Bye!")
